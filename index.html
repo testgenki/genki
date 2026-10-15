@@ -134,7 +134,7 @@ document.addEventListener('drop',e=>{if(e.target.id=='bl'){e.preventDefault();pu
 /* ---------- Password gate ---------- */
 function gate(){const h=HASH||localStorage.ph;app.innerHTML=`<div class="card" style="max-width:380px;margin:14vh auto"><h1>げんき</h1><p class="mu">${h?'Enter your password':'First visit: choose a password (6+ characters)'}</p><input id="pw" type="password" autocomplete="current-password"><p><button class="pri" id="go">${h?'Unlock':'Set password'}</button></p><p id="msg" class="no"></p></div>`;
 const go=async()=>{const v=$('#pw').value,x=await sha(v);if(h){if(x!=h)return $('#msg').textContent='Wrong password.'}else{if(v.length<6)return $('#msg').textContent='Use at least 6 characters.';localStorage.ph=x;prompt('Copy this into HASH near the top of index.html and commit it, so every device uses this password:',x)}sessionStorage.ok=1;start()};
-$('#go').onclick=go;$('#pw').onkeydown=e=>e.key=='Enter'&&go()}
+$('#go').onclick=go;$('#pw').addEventListener('keydown',e=>{if(e.key=='Enter')go()})}
 async function start(){await pull();document.body.classList.toggle('nf',!S.furi);render()}
 if(sessionStorage.ok)start();else gate();
 </script></body></html>
