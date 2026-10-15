@@ -4,7 +4,8 @@
  },
  "off": {
   "友達": false,
-  "田中": false
+  "田中": false,
+  "学生": false
  },
  "furi": true
 }
