@@ -33,7 +33,7 @@ table{width:100%;border-collapse:collapse}td{padding:6px 8px;border-bottom:1px s
 </style></head><body><div id="app"></div><div id="toast"></div>
 <script>
 // Paste your password hash here (the app shows it on first run). Empty = per-browser password.
-const HASH="2dca945ad992e1048c99fc40dd5f2674b229fc58435b4271050d9c6c6e3f2e56";
+const HASH="";
 const $=s=>document.querySelector(s),app=$('#app');
 let S=JSON.parse(localStorage.g||'{}');S.sc=S.sc||{};S.off=S.off||{};S.furi=S.furi!==false;S.gh=S.gh||{};
 let V={l:null,tab:'learn'},Q=null,t0,sha0,tt;
@@ -49,7 +49,10 @@ function cfg(){const g=S.gh,o=prompt('GitHub username',g.o||'');if(!o)return;con
 // [漢字|かんじ] = furigana (tap to hide per kanji). {は|わ} = shown は, spoken わ.
 const fu=s=>s.replace(/\[([^|\]]+)\|([^\]]+)\]/g,(m,k,r)=>`<ruby class="k${S.off[k]?' off':''}" data-k="${k}">${k}<rt>${r}</rt></ruby>`).replace(/\{([^|}]+)\|[^}]+\}/g,'$1');
 const rd=s=>s.replace(/\[([^|\]]+)\|([^\]]+)\]/g,'$2').replace(/\{[^|}]+\|([^}]+)\}/g,'$1').replace(/<br>|[AB]：|_|\s/g,'');
-function say(t){const vs=speechSynthesis.getVoices().filter(v=>/^ja/i.test(v.lang)),u=new SpeechSynthesisUtterance(rd(t));u.lang='ja-JP';u.voice=vs.find(v=>/Google|Kyoko|Nanami|Haruka|O-Ren|Enhanced|Premium/i.test(v.name))||vs[0]||null;u.rate=.85;if(!vs.length)flash('No Japanese voice found: install one in your device speech settings.');speechSynthesis.cancel();speechSynthesis.speak(u)}
+const jv=()=>speechSynthesis.getVoices().filter(v=>/^ja/i.test(v.lang));
+function say(t){const vs=jv(),u=new SpeechSynthesisUtterance(rd(t));u.lang='ja-JP';u.voice=vs.find(v=>v.name==S.voice)||vs.find(v=>/Natural|Neural|Online|Premium|Enhanced|Google|Kyoko|O-Ren/i.test(v.name))||vs[0]||null;u.rate=S.rate||.85;if(!vs.length)flash('No Japanese voice found: install one in your device speech settings.');speechSynthesis.cancel();speechSynthesis.speak(u)}
+speechSynthesis.onvoiceschanged=()=>{if(V.l!=null&&V.tab=='listen'&&!Q)render()};
+const vc=()=>`<div class="card"><p><select onchange="S.voice=this.value;save()" aria-label="Voice">${jv().map(v=>`<option ${v.name==S.voice?'selected':''}>${v.name}</option>`).join('')||'<option>No Japanese voice found</option>'}</select> <label>Speed <input type="range" min=".5" max="1.1" step=".05" value="${S.rate||.85}" onchange="S.rate=+this.value;save()"></label> <button data-s="[学生|がくせい]です。">▶ Test</button></p><p><small>Japanese drops some vowels: <b>がくせい</b> sounds like "gaksei" and <b>です</b> like "des". The browser can't force this, it depends on the voice. If a voice says every vowel, try another one here. Natural/Neural voices (Edge's "Microsoft … Natural", Chrome's Google 日本語, Apple's Enhanced/Premium Kyoko) do it best.</small></p></div>`;
 const sp=j=>`<button class="sp" data-s="${j}" aria-label="Play audio">▶</button>`;
 /* ---------- Romaji → kana input ---------- */
 const M={'-':'ー','.':'。',',':'、',shi:'し',chi:'ち',tsu:'つ',fu:'ふ',ji:'じ',xtsu:'っ'};
@@ -58,7 +61,8 @@ for(const c in R)[...R[c]].forEach((k,i)=>k!='_'&&(M[(c=='a'?'':c)+'aiueo'[i]]=k
 [['ky','き'],['gy','ぎ'],['ny','に'],['hy','ひ'],['by','び'],['py','ぴ'],['my','み'],['ry','り'],['sh','し'],['ch','ち'],['j','じ'],['jy','じ']].forEach(([p,k])=>[...'aiueo'].forEach((v,i)=>'aou'.includes(v)&&(M[p+v]=k+'ゃゅょ'['aou'.indexOf(v)])));
 function toKana(s,f){s=s.toLowerCase();let o='',i=0;while(i<s.length){const r=s.slice(i);
 if(/^([kstpcgzdbhmrfjw])\1/.test(r)){o+='っ';i++;continue}
-if(r[0]=='n'&&r[1]=='n'){o+='ん';i+=2;continue}
+if(!f&&r=='nn'){o+=r;break}
+if(r[0]=='n'&&(r[1]=="'"||(r[1]=='n'&&!/[aiueoy]/.test(r[2]||'')))){o+='ん';i+=2;continue}
 if(r[0]=='n'&&r[1]&&!/[aiueoy]/.test(r[1])){o+='ん';i++;continue}
 if(r=='n'&&f){o+='ん';i++;continue}
 const k=M[r.slice(0,4)]?4:M[r.slice(0,3)]?3:M[r.slice(0,2)]?2:M[r[0]]?1:0;
@@ -86,7 +90,7 @@ const bar=()=>`<header><b class="logo" onclick="V={l:null};render()">げんき</
 const shell=h=>bar()+'<main>'+h+'</main>';
 const home=()=>`<h1>Lessons</h1><p class="mu">Tap any kanji to hide or show its furigana (it stays that way for that kanji). Lessons 3–23 are outlined and will unlock as they are added.</p><div class="grid">`+Array.from({length:23},(_,i)=>{const d=L[i],n=i+1;return `<button class="les" ${d?`onclick="V={l:${i},tab:'learn'};render()"`:'disabled'}><span class="seal">${n}</span><span>${d?d.t:OUT[i-2]}</span><small>${d?(S.sc[n]!=null?'Best '+S.sc[n]+'%':'Not tested yet'):'Coming next'}</small></button>`}).join('')+'</div>';
 const learn=d=>`<section><h2>Vocabulary</h2><div class="card"><table>${d.v.map(([j,r,e])=>`<tr><td>${sp(j)}</td><td class="jp">${fu(j)}</td><td>${r}</td><td>${e}</td></tr>`).join('')}</table></div></section>`+d.g.map((g,i)=>`<section><h2>Grammar ${i+1}: ${g.h}</h2><div class="card">${g.b}${g.x.map(([j,e])=>`<p>${sp(j)}<span class="jp">${fu(j)}</span><br><small>${e}</small></p>`).join('')}</div></section>`).join('');
-const listen=d=>`<section><h2>Listening: sentences</h2><p class="mu">Audio is spoken from the kana reading, so kanji are never misread and the particle は is voiced as "wa".</p><div class="card">${d.g.flatMap(g=>g.x).map(([j,e])=>`<p>${sp(j)}<span class="jp">${fu(j)}</span><br><small>${e}</small></p>`).join('')}</div></section><section><h2>Listening: dictation</h2><div class="card"><p>Hear a word, then write it in kana.</p><button class="pri" onclick="startQ(${V.l},'listen')">Start dictation</button></div></section>`;
+const listen=d=>`<section><h2>Voice & pronunciation</h2>${vc()}</section><section><h2>Listening: sentences</h2><p class="mu">Audio is spoken from the kana reading, so kanji are never misread and the particle は is voiced as "wa".</p><div class="card">${d.g.flatMap(g=>g.x).map(([j,e])=>`<p>${sp(j)}<span class="jp">${fu(j)}</span><br><small>${e}</small></p>`).join('')}</div></section><section><h2>Listening: dictation</h2><div class="card"><p>Hear a word, then write it in kana.</p><button class="pri" onclick="startQ(${V.l},'listen')">Start dictation</button></div></section>`;
 const read=d=>`<section><h2>Reading passage</h2><div class="card"><p class="jp">${sp(d.rd.j)}${fu(d.rd.j)}</p><details><summary>Show English</summary><p>${d.rd.en}</p></details></div></section><section><h2>Comprehension questions</h2><div class="card"><button class="pri" onclick="startQ(${V.l},'read')">Start questions</button></div></section>`;
 const test=(d,n)=>`<section><h2>Tests</h2><p class="mu">Best score: ${S.sc[n]!=null?S.sc[n]+'%':'none yet'}. Anything you write is in kana: type romaji and it converts as you type.</p><div class="grid">${[['mix','Mixed test','All question types'],['type','Write the word','English to kana'],['fill','Fill in the blank','Type the answer'],['drop','Fill in the blank','Drag or tap the answer'],['mc','Multiple choice','Word meanings'],['listen','Dictation','Hear it, write it'],['read','Reading questions','Passage comprehension']].map(([m,a,b])=>`<button class="les" onclick="startQ(${n-1},'${m}')"><b>${a}</b><small>${b}</small></button>`).join('')}</div></section>`;
 const lesson=()=>{const d=L[V.l],n=V.l+1;return `<button onclick="V={l:null};render()">← All lessons</button><h1><span class="seal">${n}</span> ${d.t}</h1><nav>${[['learn','Learn'],['listen','Listen'],['read','Read'],['test','Test']].map(([k,l])=>`<button class="${V.tab==k?'on':''}" onclick="V.tab='${k}';render()">${l}</button>`).join('')}</nav>`+({learn,listen,read,test})[V.tab](d,n)};
@@ -110,10 +114,10 @@ else h+=`<p class="big">${q.p}</p>`;
 if(q.k=='drop')h+=`<p>${q.o.map(v=>`<button class="chip" draggable="true" data-v="${v}">${v}</button>`).join('')}</p><p><small>Drag a word into the blank, or tap it.</small></p>`;
 if(q.k=='mc')h+=q.o.map(v=>`<button class="opt" data-v="${v}">${v}</button>`).join('');
 if(TY.includes(q.k))h+=`<input id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${Q.kata?'type romaji → カタカナ':'type romaji → ひらがな'}">`;
-h+=`</div><div class="fb" id="fb"></div>`+(q.k=='mc'?'':`<button class="pri" id="chk" onclick="ck()">Check</button>`);
+h+=`<div id="pv" class="mu"></div></div><div class="fb" id="fb"></div>`+(q.k=='mc'?'':`<button class="pri" id="chk" onclick="ck()">Check</button>`);
 app.innerHTML=shell(h);if($('#ans'))$('#ans').focus();if(q.k=='listen')setTimeout(()=>say(q.s),250)}
 function ck(v){if(Q.d)return;const q=Q.q[Q.i];let g,ok;
-if(TY.includes(q.k)){g=toKana($('#ans').value,1);if(Q.kata)g=kt(g);ok=nz(g)==nz(q.a)}else{g=v!==undefined?v:Q.pick;if(!g)return;ok=g==q.a}
+if(TY.includes(q.k)){g=toKana($('#ans').value,1);if(Q.kata)g=kt(g);$('#ans').value=g;$('#pv').textContent='';ok=nz(g)==nz(q.a)}else{g=v!==undefined?v:Q.pick;if(!g)return;ok=g==q.a}
 Q.d=1;if(ok)Q.s++;else Q.miss.push(q.a);
 $('#fb').innerHTML=ok?'<span class="ok">✓ Correct</span>':`<span class="no">✗ Answer: ${q.a}</span>`+(g?` <small>(you wrote: ${g})</small>`:'');
 if($('#chk'))$('#chk').remove();$('#fb').insertAdjacentHTML('afterend',`<button class="pri" onclick="nx()">${Q.i+1<Q.q.length?'Next':'Finish'}</button>`)}
@@ -126,7 +130,7 @@ if(k){const c=k.dataset.k;S.off[c]=!S.off[c];document.querySelectorAll('.k').for
 const s=t.closest('[data-s]');if(s)return say(s.dataset.s);
 const c=t.closest('.chip');if(c)return put(c.dataset.v);
 const o=t.closest('.opt');if(o)ck(o.dataset.v)});
-document.addEventListener('input',e=>{if(e.target.id!='ans')return;let x=toKana(e.target.value);if(Q&&Q.kata)x=kt(x);e.target.value=x});
+document.addEventListener('input',e=>{if(e.target.id!='ans')return;let x=toKana(e.target.value);if(Q&&Q.kata)x=kt(x);e.target.value=x;let y=toKana(x,1);if(Q&&Q.kata)y=kt(y);$('#pv').textContent=y!=x?'→ '+y:''});
 document.addEventListener('keydown',e=>{if(e.key!='Enter'||!Q)return;if(Q.d)nx();else if(e.target.id=='ans')ck()});
 document.addEventListener('dragstart',e=>{const v=e.target.dataset&&e.target.dataset.v;if(v)e.dataTransfer.setData('text/plain',v)});
 document.addEventListener('dragover',e=>{if(e.target.id=='bl')e.preventDefault()});
