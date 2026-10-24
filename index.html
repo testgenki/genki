@@ -59,8 +59,8 @@ const M={'-':'ー','.':'。',',':'、',shi:'し',chi:'ち',tsu:'つ',fu:'ふ',ji
 const R={a:'あいうえお',k:'かきくけこ',s:'さしすせそ',t:'たちつてと',n:'なにぬねの',h:'はひふへほ',m:'まみむめも',y:'や_ゆ_よ',r:'らりるれろ',w:'わ___を',g:'がぎぐげご',z:'ざじずぜぞ',d:'だぢづでど',b:'ばびぶべぼ',p:'ぱぴぷぺぽ'};
 for(const c in R)[...R[c]].forEach((k,i)=>k!='_'&&(M[(c=='a'?'':c)+'aiueo'[i]]=k));
 [['ky','き'],['gy','ぎ'],['ny','に'],['hy','ひ'],['by','び'],['py','ぴ'],['my','み'],['ry','り'],['sh','し'],['ch','ち'],['j','じ'],['jy','じ']].forEach(([p,k])=>[...'aiueo'].forEach((v,i)=>'aou'.includes(v)&&(M[p+v]=k+'ゃゅょ'['auo'.indexOf(v)])));
-Object.assign(M,{fa:'ふぁ',fi:'ふぃ',fe:'ふぇ',fo:'ふぉ',she:'しぇ',che:'ちぇ',je:'じぇ',thi:'てぃ',dhi:'でぃ',wi:'うぃ',we:'うぇ',xa:'ぁ',xi:'ぃ',xu:'ぅ',xe:'ぇ',xo:'ぉ',xya:'ゃ',xyu:'ゅ',xyo:'ょ',xtu:'っ'});
-function toKana(s,f){s=s.toLowerCase();let o='',i=0;while(i<s.length){const r=s.slice(i);
+Object.assign(M,{fa:'ふぁ',fi:'ふぃ',fe:'ふぇ',fo:'ふぉ',she:'しぇ',che:'ちぇ',je:'じぇ',thi:'てぃ',dhi:'でぃ',wi:'うぃ',we:'うぇ',xa:'ぁ',xi:'ぃ',xu:'ぅ',xe:'ぇ',xo:'ぉ',xya:'ゃ',xyu:'ゅ',xyo:'ょ',xtu:'っ',sya:'しゃ',syu:'しゅ',syo:'しょ',tya:'ちゃ',tyu:'ちゅ',tyo:'ちょ',zya:'じゃ',zyu:'じゅ',zyo:'じょ'});
+function toKana(s,f,K){s=s.toLowerCase();let o='',i=0;while(i<s.length){const r=s.slice(i);if(K&&/^[td]i/.test(r)){o+=r[0]=='t'?'てぃ':'でぃ';i+=2;continue}
 if(/^([kstpcgzdbhmrfjw])\1/.test(r)){o+='っ';i++;continue}
 if(!f&&r=='nn'){o+=r;break}
 if(r[0]=='n'&&(r[1]=="'"||(r[1]=='n'&&!/[aiueoy]/.test(r[2]||'')))){o+='ん';i+=2;continue}
@@ -216,7 +216,7 @@ const GT={13:'Potential Verbs|〜し|〜そうです (It looks like . . .)|〜�
 /* tidy repeated sections + extra Lesson 6 grammar */
 (()=>{const keep=(i,hs)=>{L[i].g=hs.map(t=>L[i].g.find(x=>x.h==t))};keep(0,["Greetings and set phrases","Numbers 0–100","X は Y です: \"X is Y\"","Questions with か","Saying \"is not\": じゃありません","の and も","Names and さん","Countries and nationalities","Asking \"what\": 何","Telling the time & phone numbers"]);keep(1,["これ・それ・あれ","この・その・あの + noun","ここ・そこ・あそこ and だれ","どれ・どの・どこ: question words","と: joining nouns","Prices: いくら & numbers over 100","Days of the week","Negative nouns: じゃないです","も (also) and ね / よ"]);L[5].g.push(...[{"h":"Casual requests: て on its own","b":"<p>Among friends you can drop <b>ください</b>: the plain て-form alone is a casual \"please do it\". Keep ください for teachers and people you do not know well.</p>","x":[["ちょっと[待|ま]って。","Wait a sec."],["[本|ほん]を[読|よ]んで。","Read the book, please."]]},{"h":"Not allowed: 〜てはいけません","b":"<p>て-form + <b>はいけません</b> says something is not allowed. It is the opposite of 〜てもいいです.</p>","x":[["ここで[食|た]べてはいけません。","You must not eat here."],["ここで[話|はな]してはいけません。","You must not talk here."]]},{"h":"Offers and suggestions: 〜ましょうか","b":"<p>Take the verb stem (the ます-form without ます) and add <b>ましょうか</b>: \"Shall I...?\" when you offer to do something, \"Shall we...?\" when you suggest doing it together. A polite yes is <b>はい、おねがいします</b>.</p>","x":[["ここで[待|ま]ちましょうか。","Shall we wait here?"],["[音楽|おんがく]を[聞|き]きましょうか。","Shall we listen to music?"],["はい、おねがいします。","Yes, please."]]}]);L[5].q.push(...[{"s":"ここで[食|た]べては___。","a":"いけません","en":"You must not eat here.","o":["いけません","いいです","ください","ですか"]},{"s":"ここで[待|ま]ち___。","a":"ましょうか","en":"Shall we wait here?","o":["ましょうか","ますか","ください","てもいいですか"]}])})();
 /* ---------- Views ---------- */
-const bar=()=>`<header><b class="logo" onclick="V={l:null};render()">げんき</b><span><label><input type="checkbox" ${S.furi?'checked':''} onchange="S.furi=this.checked;document.body.classList.toggle('nf',!S.furi);save()"> Furigana</label><button onclick="cfg()">GitHub sync</button><button onclick="sessionStorage.clear();location.reload()">Lock</button></span></header>`;
+const bar=()=>`<header><b class="logo" onclick="V={l:null};render()">げんき</b><span><label><input type="checkbox" ${S.furi?'checked':''} onchange="S.furi=this.checked;document.body.classList.toggle('nf',!S.furi);save()"> Furigana</label><button onclick="V={l:null,mid:1,mt:'p'};render()">Midterm</button><button onclick="cfg()">GitHub sync</button><button onclick="sessionStorage.clear();location.reload()">Lock</button></span></header>`;
 const shell=h=>bar()+'<main>'+h+'</main>';
 const home=()=>`<h1>Lessons</h1><p class="mu">Tap any kanji to hide or show its furigana (it stays that way for that kanji). Every lesson has its full vocabulary list. Grammar explanations are written for Lessons 1–18; Lessons 19–23 list every grammar section, with explanations on the way.</p><div class="grid">`+Array.from({length:23},(_,i)=>{const d=L[i],n=i+1;return `<button class="les" ${d?`onclick="V={l:${i},tab:'learn'};render()"`:'disabled'}><span class="seal">${n}</span><span>${d?d.t:OUT[i-2]}</span><small>${d?(S.sc[n]!=null?'Best '+S.sc[n]+'%':'Not tested yet'):'Coming next'}</small></button>`}).join('')+'</div>';
 const vt=a=>`<div class="card"><table>${a.map(([j,r,e,p])=>`<tr><td>${sp(j)}</td><td class="jp">${fu(j)}</td><td>${e}</td><td><small>${p||''}</small></td></tr>`).join('')}</table></div>`;
@@ -234,17 +234,17 @@ const read=d=>!d.rd?'<section><h2>Reading passage</h2><div class="card"><p class
 const test=(d,n)=>{const all=pool(d,n),k=all.filter(w=>on(n,w)).length,gl={g:'Greetings',c:'Classroom expressions',m:'Vocabulary',r:'Reading & Writing',e:'Column words'},gs=VX&&VX[n]?Object.keys(gl).filter(g=>VX[n][g]&&VX[n][g].length):[],inp='style="font:inherit;padding:6px;background:var(--bg);color:var(--ink);border:1px solid var(--ln);border-radius:6px"';
 return `<section><h2>Test settings</h2><div class="card"><p><b id="wc">${k} of ${all.length}</b> words selected. Word tests ask each selected word once, so more words make a longer test.</p><p><button data-sel="all">Select all</button> <button data-sel="none">Select none</button> ${gs.map(g=>`<button data-sel="${g}">Only ${gl[g]}</button>`).join(' ')}</p><p><label>Max questions per test (blank = no limit) <input type="number" min="1" id="cap" value="${S.cap||''}" style="width:90px" ${inp}></label></p><details><summary>Choose words (<span id="wc2">${k} of ${all.length}</span> selected)</summary><p style="display:flex;gap:6px"><input id="wf" placeholder="${WK?'Type romaji to filter by Japanese word':'Filter by English meaning'}" style="flex:1" ${inp}><button data-wfm="1">${WK?'あ Kana':'A English'}</button></p><p><button data-selv="1">Select shown</button> <button data-selv="0">Deselect shown</button></p><div id="wl" style="max-height:340px;overflow:auto"><div id="wi" style="position:sticky;top:0;background:var(--card);padding:4px 0;font-weight:700">${k} of ${all.length} selected</div>${all.map(w=>`<label data-t="${esc([w[1].replace(/\|/g,' '),w[0].replace(/\[([^|\]]+)\|[^\]]+\]/g,'$1'),w[2]].join(' '))}" style="display:flex;gap:8px;align-items:baseline;padding:3px 0"><input type="checkbox" class="wk" data-k="${esc(wk(w))}" ${on(n,w)?'checked':''}><span class="jp">${fu(w[0])}</span><small>${esc(w[2])}</small></label>`).join('')}</div></details></div></section><section><h2>Tests</h2><p class="mu">Best score: ${S.sc[n]!=null?S.sc[n]+'%':'none yet'}. Anything you write is in kana: type romaji and it converts as you type.</p><div class="grid">${[['mix','Mixed test','Each selected word in a random format, plus grammar'],['type','Write the word','English to kana'],['fill','Fill in the blank','Type the answer'],['drop','Fill in the blank','Drag or tap the answer'],['mc','Multiple choice','Word meanings'],['listen','Dictation','Hear it, write it'],['read','Reading questions','Passage comprehension']].map(([m,a,b])=>`<button class="les" onclick="startQ(${n-1},'${m}')"><b>${a}</b><small>${b}</small></button>`).join('')}</div></section>`};
 const lesson=()=>{const d=L[V.l],n=V.l+1;return `<button onclick="V={l:null};render()">← All lessons</button><h1><span class="seal">${n}</span> ${d.t}</h1><nav>${[['learn','Learn'],['listen','Listen'],['read','Read'],['test','Test']].map(([k,l])=>`<button class="${V.tab==k?'on':''}" onclick="V.tab='${k}';render()">${l}</button>`).join('')}</nav>`+({learn,listen,read,test})[V.tab](d,n)};
-function render(){Q=null;window.scrollTo(0,0);app.innerHTML=shell(V.l==null?home():lesson())}
+function render(){Q=null;window.scrollTo(0,0);app.innerHTML=shell(V.mid?midView():V.l==null?home():lesson())}
 /* ---------- Quiz engine ---------- */
 const sh=a=>[...a].sort(()=>Math.random()-.5);
 const pool=(d,n)=>[...(VX&&VX[n]?[...new Map(['g','c','m','r','e'].flatMap(k=>VX[n][k]||[]).map(e=>[e[0]+e[2],e])).values()]:d.v),...(S.my[n]||[])];
 const wk=w=>w[1]+'|'+w[2],on=(n,w)=>!(S.dis[n]||[]).includes(wk(w)),esc=x=>x.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'),grp=(n,w)=>VX&&VX[n]?['g','c','m','r','e'].filter(g=>(VX[n][g]||[]).some(e=>e[0]+e[2]==w[0]+w[2])):[];
 let WK=1;
 function wc(){const n=V.l+1,a=pool(L[V.l],n),k=a.filter(w=>on(n,w)).length,t=k+' of '+a.length;['#wc','#wc2'].forEach(i=>$(i)&&($(i).textContent=t));const rows=[...document.querySelectorAll('#wl label')],vis=rows.filter(l=>l.style.display!='none'),vs=vis.filter(l=>l.querySelector('input').checked).length;if($('#wi'))$('#wi').textContent=vis.length<rows.length?`Showing ${vis.length} matches, ${vs} selected (${t} selected overall)`:t+' selected'}
-function flt(){const f=$('#wf');if(!f)return;let q=f.value.toLowerCase();if(WK)q=hk(toKana(q,1));document.querySelectorAll('#wl label').forEach(l=>{const t=l.dataset.t;l.style.display=!q||(WK?hk(t):t.toLowerCase()).includes(q)?'':'none'});wc()}
+function flt(){const f=$('#wf');if(!f)return;let q=f.value.toLowerCase(),q2='';if(WK){q2=hk(toKana(q,1,1));q=hk(toKana(q,1))}document.querySelectorAll('#wl label').forEach(l=>{const t=WK?hk(l.dataset.t):l.dataset.t.toLowerCase();l.style.display=!q||t.includes(q)||(q2&&t.includes(q2))?'':'none'});wc()}
 function setVis(x){const n=V.l+1,a=S.dis[n]||(S.dis[n]=[]);document.querySelectorAll('#wl label').forEach(l=>{if(l.style.display=='none')return;const c=l.querySelector('input'),k=c.dataset.k,i=a.indexOf(k);c.checked=x;if(x&&i>=0)a.splice(i,1);if(!x&&i<0)a.push(k)});save();wc()}
 function sel(g){const n=V.l+1;S.dis[n]=pool(L[V.l],n).filter(w=>g=='all'?0:g=='none'?1:!grp(n,w).includes(g)).map(wk);document.querySelectorAll('.wk').forEach(c=>c.checked=!S.dis[n].includes(c.dataset.k));save();wc()}
-document.addEventListener('change',e=>{const t=e.target;if(t.id=='cap'){S.cap=Math.max(0,+t.value||0);save();return}if(!t.classList||!t.classList.contains('wk'))return;const n=V.l+1,a=S.dis[n]||(S.dis[n]=[]),k=t.dataset.k,i=a.indexOf(k);if(t.checked&&i>=0)a.splice(i,1);if(!t.checked&&i<0)a.push(k);save();wc()});
+document.addEventListener('change',e=>{const t=e.target;if(t.id=='nm'){t.value=kt(toKana(t.value,1,1));return}if(t.id=='cap'){S.cap=Math.max(0,+t.value||0);save();return}if(!t.classList||!t.classList.contains('wk'))return;const n=V.l+1,a=S.dis[n]||(S.dis[n]=[]),k=t.dataset.k,i=a.indexOf(k);if(t.checked&&i>=0)a.splice(i,1);if(!t.checked&&i<0)a.push(k);save();wc()});
 function bq(d,m,n){const all=pool(d,n),v=all.filter(w=>on(n,w)),
 tw=([j,r,e])=>({k:'type',p:`Write in kana: <b>${e}</b>`,a:[...new Set([r,...all.filter(x=>x[2]==e).map(x=>x[1])])].join('|')}),
 mw=([j,r,e])=>({k:'mc',p:`What does ${fu(j)} mean?`,a:e,o:sh([e,...sh(all.filter(x=>x[2]!=e)).slice(0,3).map(x=>x[2])])}),
@@ -263,24 +263,102 @@ else if(q.k=='fill'||q.k=='drop')h+=`<p class="jp big">${fu(q.p).replace('___','
 else h+=`<p class="big">${q.p}</p>`;
 if(q.k=='drop')h+=`<p>${q.o.map(v=>`<button class="chip" draggable="true" data-v="${v}">${v}</button>`).join('')}</p><p><small>Drag a word into the blank, or tap it.</small></p>`;
 if(q.k=='mc')h+=q.o.map(v=>`<button class="opt" data-v="${v}">${v}</button>`).join('');
-if(TY.includes(q.k))h+=`<input id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${Q.kata?'type romaji → カタカナ':'type romaji → ひらがな'}">`;
+if(TY.includes(q.k))h+=`<input id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${q.ph||(Q.kata?'type romaji → カタカナ':'type romaji → ひらがな')}">`;
 h+=`<div id="pv" class="mu"></div></div><div class="fb" id="fb"></div>`+(q.k=='mc'?'':`<button class="pri" id="chk" onclick="ck()">Check</button>`);
 app.innerHTML=shell(h);if($('#ans'))$('#ans').focus();if(q.k=='listen')setTimeout(()=>say(q.s),250)}
 function ck(v){if(Q.d)return;const q=Q.q[Q.i];let g,ok;
-if(TY.includes(q.k)){g=toKana($('#ans').value,1);if(Q.kata)g=kt(g);$('#ans').value=g;$('#pv').textContent='';ok=q.a.split('|').some(x=>nz(x)==nz(g)||(!/^[ァ-ヶー]+$/.test(x)&&hk(nz(x))==hk(nz(g))))}else{g=v!==undefined?v:Q.pick;if(!g)return;ok=g==q.a}
+if(TY.includes(q.k)){g=toKana($('#ans').value,1,Q.kata);if(Q.kata)g=kt(g);$('#ans').value=g;$('#pv').textContent='';ok=q.a.split('|').some(x=>nz(x)==nz(g)||(!/^[ァ-ヶー]+$/.test(x)&&hk(nz(x))==hk(nz(g))))}else{g=v!==undefined?v:Q.pick;if(!g)return;ok=g==q.a}
 Q.d=1;if(ok)Q.s++;else Q.miss.push(q.a);
 $('#fb').innerHTML=ok?'<span class="ok">✓ Correct</span>':`<span class="no">✗ Answer: ${q.a.split('|').join(' / ')}</span>`+(g?` <small>(you wrote: ${g})</small>`:'');
 if($('#chk'))$('#chk').remove();$('#fb').insertAdjacentHTML('afterend',`<button class="pri" onclick="nx()">${Q.i+1<Q.q.length?'Next':'Finish'}</button>`)}
-function nx(){Q.i++;Q.i<Q.q.length?qn():fin()}
+function nx(){Q.i++;Q.i<Q.q.length?qn():Q.mid?finM():fin()}
 function fin(){const p=Math.round(Q.s/Q.q.length*100),n=Q.l+1;S.sc[n]=Math.max(S.sc[n]||0,p);save();app.innerHTML=shell(`<div class="card"><h1>${p}%</h1><p>${Q.s} of ${Q.q.length} correct.</p>${Q.miss.length?`<p>Review: <span class="jp">${[...new Set(Q.miss)].join('、').replace(/\|/g,'/')}</span></p>`:''}<button class="pri" onclick="startQ(${Q.l},'${Q.m}')">Try again</button> <button onclick="V={l:${Q.l},tab:'test'};render()">Back to tests</button></div>`);Q=null}
 const put=v=>{if(Q&&!Q.d&&$('#bl')){Q.pick=v;$('#bl').textContent=v}};
+/* ---------- Midterm practice (generated fresh each time) ---------- */
+const rnd=n=>Math.floor(Math.random()*n),pk=a=>a[rnd(a.length)],pks=(a,n)=>sh(a).slice(0,n);
+const PE=[['[田中|たなか]','たなか','Tanaka'],['[山田|やまだ]','やまだ','Yamada'],['[鈴木|すずき]','すずき','Suzuki'],['[佐藤|さとう]','さとう','Sato'],['[高橋|たかはし]','たかはし','Takahashi']],
+IT=[['かばん','かばん','bag'],['[傘|かさ]','かさ','umbrella'],['[靴|くつ]','くつ','pair of shoes'],['[本|ほん]','ほん','book'],['[時計|とけい]','とけい','watch'],['[帽子|ぼうし]','ぼうし','hat'],['[財布|さいふ]','さいふ','wallet'],['ノート','ノート','notebook'],['ペン','ペン','pen'],['[新聞|しんぶん]','しんぶん','newspaper']],
+PL=[['[図書館|としょかん]','としょかん','library'],['[銀行|ぎんこう]','ぎんこう','bank'],['[郵便局|ゆうびんきょく]','ゆうびんきょく','post office'],['コンビニ','コンビニ','convenience store'],['トイレ','トイレ','restroom']],
+OC=[['[学生|がくせい]','がくせい','student'],['[先生|せんせい]','せんせい','teacher'],['[大学生|だいがくせい]','だいがくせい','university student'],['[留学生|りゅうがくせい]','りゅうがくせい','international student'],['[会社員|かいしゃいん]','かいしゃいん','office worker']],
+CT=[['アメリカ','アメリカ','America'],['イギリス','イギリス','Britain'],['[韓国|かんこく]','かんこく','Korea'],['[中国|ちゅうごく]','ちゅうごく','China'],['[日本|にほん]','にほん','Japan']],
+MJ=[['[歴史|れきし]','れきし','history'],['[経済|けいざい]','けいざい','economics'],['[英語|えいご]','えいご','English'],['ビジネス','ビジネス','business'],['[日本語|にほんご]','にほんご','Japanese']],
+NMS=[['Michael','マイケル'],['Jennifer','ジェニファー'],['David','デイビッド|デービッド'],['Emily','エミリー'],['Chris','クリス'],['Sarah','サラ|セーラ'],['Kevin','ケビン'],['Jessica','ジェシカ'],['Daniel','ダニエル'],['Anna','アンナ'],['Brian','ブライアン'],['Lisa','リサ'],['Tom','トム'],['Alex','アレックス'],['Tim','ティム']],
+AG=[[18,'じゅうはっさい'],[19,'じゅうきゅうさい'],[20,'はたち'],[21,'にじゅういっさい'],[22,'にじゅうにさい'],[23,'にじゅうさんさい']],YR=['いち','に','さん','よん'],PO=['は','の','も','か'],
+GR=[['you meet someone for the first time','はじめまして'],['you finish introducing yourself','どうぞよろしくおねがいします'],['it is morning','おはようございます'],['it is afternoon','こんにちは'],['it is evening','こんばんは'],['you are about to eat','いただきます'],['you have finished eating','ごちそうさまでした'],['you leave home','いってきます'],['someone leaves home and you stay','いってらっしゃい'],['you come back home','ただいま'],['someone comes home and you greet them','おかえりなさい'],['you go to bed','おやすみなさい'],['you thank someone politely','ありがとうございます'],['you want to say excuse me or sorry','すみません'],['you part from someone','さようなら']],
+QF=[['いま___ですか','なんじ','What time is it now?'],['でんわばんごうは___ですか','なんばん','What is your phone number?'],['___ですか','なんさい','How old are you?'],['___ですか','なんねんせい','What year are you in?'],['せんこうは___ですか','なん','What is your major?'],['ごしゅっしんは___ですか','どこ','Where are you from?'],['おなまえは___ですか','なん','What is your name?']],QW=['なんじ','なんばん','なんさい','なんねんせい','なん','どこ'],
+NP=[['[大学|だいがく]の[先生|せんせい]','だいがくのせんせい','university teacher'],['[英語|えいご]の[先生|せんせい]','えいごのせんせい','English teacher'],['[歴史|れきし]の[学生|がくせい]','れきしのがくせい','history student'],['[日本語|にほんご]の[本|ほん]','にほんごのほん','Japanese book']],
+PR=[100,120,150,180,200,300,350,480,500,600,680,800,900,980,1000,1200,1500,1800,2000,2500,3000,3800,4500,5000,6000,8000,9800,10000,12000,15000,30000,50000,80000],
+SH=[['you decide to buy this item','これをください|これをおねがいします'],['you want to ask the price','これはいくらですか'],['a clerk greets you as you enter','いらっしゃいませ'],['a clerk thanks you after you buy','ありがとうございました']];
+const D0=['','いち','に','さん','よん','ご','ろく','なな','はち','きゅう'],nb=m=>{const t=m/1000|0,h=(m/100|0)%10,u=(m/10|0)%10;return['','せん','にせん','さんぜん','よんせん','ごせん','ろくせん','ななせん','はっせん','きゅうせん'][t]+['','ひゃく','にひゃく','さんびゃく','よんひゃく','ごひゃく','ろっぴゃく','ななひゃく','はっぴゃく','きゅうひゃく'][h]+(u?(u>1?D0[u]:'')+'じゅう':'')+D0[m%10]},nr=n=>n>=1e4?nb(n/1e4|0)+'まん'+nb(n%1e4):nb(n),NM=[999,9999,99999,999999];
+let NL=1;
+function rn(max){const dg=String(max).length,m=2+rnd(dg-1),lo=10**(m-1),st=10**Math.min(rnd(3),m-1);let n=Math.max(lo,Math.floor((lo+rnd(9*lo))/st)*st);const s=String(n).split(''),L=s.length;if(L>=3&&rnd(2)){const i=L-3-(L>=4&&rnd(2)?1:0);s[i]=pk(i==L-3?[3,6,8]:[3,8]);n=+s.join('')}return n}
+const dg='type digits, e.g. 1200',nq=(m,max)=>{const n=rn(max),a=nr(n);return[{k:'type',p:`Write in hiragana: <b>${n.toLocaleString('en-US')}</b>`,a},{k:'type',p:`Write as a number (digits): <b class="jp">${a}</b>`,a:String(n),ph:dg},{k:'listen',p:'Listen, then write the number in hiragana.',a,s:a},{k:'listen',p:'Listen, then type the number (digits).',a:String(n),s:a,ph:dg}][m]};
+const VP=()=>{const a=[...pool(L[0],1),...pool(L[1],2)];return a.length?a:[...L[0].v,...L[1].v]},dr=()=>rnd(2)?'drop':'fill',ne=(a,s)=>a+s+'じゃありません|'+a+s+'ではありません|'+a+s+'じゃないです';
+const G={
+greet:()=>{const s=pk(GR);return rnd(2)?{k:'type',p:`Write the greeting you say when ${s[0]}.`,a:s[1]}:{k:'mc',p:`What do you say when ${s[0]}?`,a:s[1],o:sh([s[1],...pks(GR.filter(x=>x!=s),3).map(x=>x[1])])}},
+intro:()=>{const n=pk(NMS),k=n[1].split('|')[0],y=rnd(4),g=pk(AG),c=pk(CT),j=pk(MJ),t=rnd(8);
+ if(t==0)return{k:'type',p:`Introduce yourself: "I am ${n[0]}."`,a:`わたしは${k}です|わたしのなまえは${k}です`};
+ if(t==1)return{k:'type',p:`Say: "I am a ${y+1}${['st','nd','rd','th'][y]}-year student."`,a:`わたしは${YR[y]}ねんせいです|${YR[y]}ねんせいです`};
+ if(t==2)return{k:'type',p:`Say: "I am ${g[0]} years old."`,a:`わたしは${g[1]}です|${g[1]}です`};
+ if(t==3)return{k:'type',p:`Say: "I am from ${c[2]}."`,a:`${c[1]}のしゅっしんです|わたしは${c[1]}のしゅっしんです`};
+ if(t==4)return{k:'type',p:`Say: "My major is ${j[2]}."`,a:`せんこうは${j[1]}です|わたしのせんこうは${j[1]}です`};
+ if(t==5)return{k:'type',p:`Say: "I am a student at UCSB." (write UCSB as カリフォルニアだいがくサンタバーバラこう)`,a:'カリフォルニアだいがくサンタバーバラこうのがくせいです|わたしはカリフォルニアだいがくサンタバーバラこうのがくせいです'};
+ return{k:dr(),p:t==6?`[私|わたし]___${k}です。`:`[私|わたし]の[専攻|せんこう]___${j[0]}です。`,a:t==6?'は':'は',en:t==6?`I am ${n[0]}.`:`My major is ${j[2]}.`,o:sh(PO)}},
+describe:()=>{const p=pk(PE),o=pk(OC),c=pk(CT),t=rnd(4);
+ if(t==0)return{k:'type',p:`Say: "${p[2]} is a ${o[2]}."`,a:`${p[1]}さんは${o[1]}です`};
+ if(t==1)return{k:'type',p:`Say: "${p[2]} is from ${c[2]}."`,a:`${p[1]}さんは${c[1]}のしゅっしんです`};
+ if(t==2)return{k:'type',p:`Ask: "Is ${p[2]} a ${o[2]}?"`,a:`${p[1]}さんは${o[1]}ですか`};
+ return{k:dr(),p:`${p[0]}さん___${o[0]}です。`,a:'は',en:`${p[2]} is a ${o[2]}.`,o:sh(PO)}},
+ask:()=>{const f=pk(QF);return rnd(2)?{k:'drop',p:f[0],a:f[1],en:f[2],o:sh([f[1],...pks(QW.filter(x=>x!=f[1]),3)])}:{k:'type',p:`Write the question: "${f[2]}"`,a:f[0].replace('___',f[1])}},
+no:()=>{const p=pk(PE),i=pk(IT),n=pk(NP),t=rnd(4);
+ if(t==0)return{k:'type',p:`Write: "${p[2]}’s ${i[2]}" (use さん)`,a:`${p[1]}さんの${i[1]}`};
+ if(t==1)return{k:'type',p:`Write: "my ${i[2]}"`,a:`わたしの${i[1]}`};
+ if(t==2)return{k:'type',p:`Write: "${n[2]}"`,a:n[1]};
+ return{k:dr(),p:`${p[0]}さん___${i[0]}`,a:'の',en:`${p[2]}’s ${i[2]}`,o:sh(PO)}},
+kore:()=>{const it=pk(IT),d=rnd(3),t=rnd(4);
+ if(t==0){const a=['この','その','あの'][d];return{k:'mc',p:`Which word can come directly before a noun, as in "___ ${it[2]}"?`,a,o:sh([a,['これ','それ','あれ'][d],['ここ','そこ','あそこ'][d],pk(['どれ','どこ','どの'])])}}
+ const adn=t>1,W=adn?['この','その','あの']:['これ','それ','あれ'];
+ return{k:dr(),p:adn?`___${it[0]}は[私|わたし]のです。`:`___は${it[0]}です。`,a:W[d],en:`The ${it[2]} is ${['near me','near you','far from both of us'][d]}.${adn?' (word + noun)':''}`,o:sh([...W,adn?'どの':'どれ'])}},
+koko:()=>{const it=rnd(2)?pk(IT):pk(PL),d=rnd(3),W=['ここ','そこ','あそこ'],pos=['near me','near you','far from both of us'][d],t=rnd(3);
+ if(t==0)return{k:'type',p:`Write: "Where is the ${it[2]}?"`,a:`${it[1]}はどこですか`};
+ if(t==1)return{k:dr(),p:`${it[0]}は___です。`,a:W[d],en:`The ${it[2]} is ${pos}.`,o:sh([...W,'どこ'])};
+ return{k:'type',p:`The ${it[2]} is ${pos}. Say where it is.`,a:`${it[1]}は${W[d]}です`}},
+dare:()=>{const p=pk(PE),i=pk(IT),t=rnd(3);
+ if(t==0)return{k:'type',p:`Write: "Whose ${i[2]} is this?"`,a:`これはだれの${i[1]}ですか`};
+ if(t==1)return{k:'type',p:`Answer: "It is ${p[2]}’s." (use さん)`,a:`${p[1]}さんのです`};
+ return{k:dr(),p:`これは___の${i[0]}ですか。`,a:'だれ',en:`Whose ${i[2]} is this?`,o:sh(['だれ','どこ','なに','いくら'])}},
+mo:()=>{const p=pk(PE),q=pk(PE.filter(x=>x!=p)),o=pk(OC),i=pk(IT),t=rnd(3);
+ if(t==0)return{k:dr(),p:`${p[0]}さん{は|わ}${o[0]}です。${q[0]}さん___${o[0]}です。`,a:'も',en:`${p[2]} is a ${o[2]}. ${q[2]} is a ${o[2]} too.`,o:sh(PO)};
+ if(t==1)return{k:'type',p:`Say: "That is also a ${i[2]}."`,a:`それも${i[1]}です`};
+ return{k:'type',p:`Say: "${q[2]} is also a ${o[2]}."`,a:`${q[1]}さんも${o[1]}です`}},
+neg:()=>{const i=pk(IT),p=pk(PE),o=pk(OC),t=rnd(3);
+ if(t==0)return{k:'type',p:`Say: "This is not a ${i[2]}."`,a:ne('これは',i[1])};
+ if(t==1)return{k:'type',p:`Say: "${p[2]} is not a ${o[2]}."`,a:ne(p[1]+'さんは',o[1])};
+ return{k:dr(),p:`これ{は|わ}${i[0]}___。`,a:'じゃありません',en:`This is not a ${i[2]}.`,o:sh(['じゃありません','です','ですか','ありません'])}},
+shop:()=>{const i=pk(IT),n=pk(PR),t=rnd(5),a=nr(n)+'えん';
+ if(t==0)return{k:'type',p:`Ask: "How much is this ${i[2]}?"`,a:`この${i[1]}はいくらですか|${i[1]}はいくらですか|これはいくらですか`};
+ if(t==1)return{k:'type',p:`The ${i[2]} costs ¥${n.toLocaleString('en-US')}. Write the price in hiragana.`,a};
+ if(t==2)return{k:'listen',p:`Listen to the price of the ${i[2]}, then type the number (digits only).`,a:String(n),s:a,ph:dg};
+ if(t==3)return{k:'type',p:`The clerk says: <b class="jp">${a}です</b>. Write the price as a number (digits).`,a:String(n),ph:dg};
+ const s=pk(SH);return{k:'mc',p:`What do you hear or say when ${s[0]}?`,a:s[1].split('|')[0],o:sh(SH.map(x=>x[1].split('|')[0]))}},
+vocab:()=>{const w=pk(VP());let t=rnd(3);if(t==1&&!/\[/.test(w[0]))t=0;return t==0?{k:'type',p:`Write in kana: <b>${w[2]}</b>`,a:w[1]}:t==1?{k:'type',p:`Write the reading of <b class="jp">${w[0].replace(/\[([^|\]]+)\|[^\]]+\]/g,'$1')}</b> in kana.`,a:w[1]}:{k:'listen',p:'Listen, then write the word in kana.',a:w[1],s:w[1].split('|')[0]}},
+name:()=>{const t=rnd(4);if(t==0)return{k:'type',p:'Write "University of California, Santa Barbara" in Japanese (kana).',a:'カリフォルニアだいがくサンタバーバラこう'};if(t==1)return{k:'type',p:'Write "Santa Barbara" in katakana.',a:'サンタバーバラ'};const n=pk(NMS);return{k:'type',p:`Write the name <b>${n[0]}</b> in katakana.`,a:n[1]}},
+num:()=>nq(rnd(4),NM[NL])};
+const MT=[['greet','Greetings','Say the right greeting'],['intro','Self-introduction','Name, year, age, hometown, major, UCSB'],['describe','Describing people','X は Y です'],['ask','Asking questions','Time, phone, name, hometown, job, year, age, major'],['no','Connecting nouns with の','Whose and of'],['kore','これ・それ・あれ and この・その・あの','Distance, and before a noun'],['koko','ここ・そこ・あそこ・どこ','Where things are'],['dare','Whose is it?','だれの'],['mo','も: also','Shared features'],['neg','Negative sentences','じゃありません'],['shop','Shopping & prices','Ask, buy, hear prices'],['vocab','Lesson 1 and 2 vocabulary','Write in hiragana / katakana'],['name','Names & UCSB','Write names in katakana']];
+const mk=(f,n)=>{const q=[],seen=new Set();for(let i=0;i<n*8&&q.length<n;i++){const x=f();if(!seen.has(x.p+x.a)){seen.add(x.p+x.a);q.push(x)}}return q};
+const numView=()=>`<p class="mu">Pick a range, then a drill. Use よん, なな and きゅう for 4, 7 and 9. Digits only when typing a number.</p><nav>${[['Up to 999'],['Up to 9,999'],['Up to 99,999'],['Up to 999,999']].map(([l],i)=>`<button class="${NL==i?'on':''}" onclick="NL=${i};render()">${l}</button>`).join('')}</nav><div class="grid">${[['Number → hiragana','See 3,800, write it'],['Hiragana → number','See the reading, type digits'],['Hearing → hiragana','Hear it, write the reading'],['Hearing → number','Hear it, type digits'],['Mixed','All four, randomly']].map(([a,b],i)=>`<button class="les" onclick="startN(${i})"><b>${a}</b><small>${b}</small></button>`).join('')}</div>`;
+const midView=()=>`<h1>Midterm practice</h1><nav>${[['p','Checklist practice'],['n','Large numbers']].map(([k,l])=>`<button class="${(V.mt||'p')==k?'on':''}" onclick="V.mt='${k}';render()">${l}</button>`).join('')}</nav>`+(V.mt=='n'?numView():`<p class="mu">Every question is generated fresh: names, items, prices and question types change each time. Type は as ha, を as wo and へ as he.</p><div class="grid"><button class="les" onclick="startM('mix')"><b>Full midterm mix</b><small>20 questions across everything</small></button>${MT.map(([k,a,b])=>`<button class="les" onclick="startM('${k}')"><b>${a}</b><small>${b}${S.sc['m-'+k]!=null?' · best '+S.sc['m-'+k]+'%':''}</small></button>`).join('')}</div><section><h2>Write your own name</h2><div class="card"><input id="nm" autocomplete="off" placeholder="type your name in romaji → katakana" style="font:inherit;font-size:1.2em;padding:8px 12px;width:100%;border:2px solid var(--ln);border-radius:6px;background:var(--bg);color:var(--ink)"><p><button onclick="say($('#nm').value)">▶ Hear it</button></p></div></section>`);
+function startM(t){Q={mid:t,q:mk(t=='mix'?()=>G[pk(Object.keys(G))]():G[t],t=='mix'?20:10),i:0,s:0,miss:[]};qn()}
+function startN(m){Q={mid:'#'+m,q:mk(()=>nq(m==4?rnd(4):m,NM[NL]),10),i:0,s:0,miss:[]};qn()}
+function finM(){const p=Math.round(Q.s/Q.q.length*100),t=Q.mid,n=t[0]=='#';S.sc['m-'+t]=Math.max(S.sc['m-'+t]||0,p);save();app.innerHTML=shell(`<div class="card"><h1>${p}%</h1><p>${Q.s} of ${Q.q.length} correct.</p>${Q.miss.length?`<p>Review: <span class="jp">${[...new Set(Q.miss)].join('、').replace(/\|/g,'/')}</span></p>`:''}<button class="pri" onclick="${n?`startN(${t[1]})`:`startM('${t}')`}">New questions</button> <button onclick="V={l:null,mid:1,mt:'${n?'n':'p'}'};render()">Back</button></div>`);Q=null}
+
 /* ---------- Events ---------- */
 document.addEventListener('click',e=>{const t=e.target,k=t.closest('.k');
 if(k){e.preventDefault();const c=k.dataset.k;S.off[c]=!S.off[c];document.querySelectorAll('.k').forEach(x=>x.dataset.k==c&&x.classList.toggle('off',!!S.off[c]));return save()}
 const m=t.closest('[data-wfm]');if(m){WK=!WK;m.textContent=WK?'あ Kana':'A English';$('#wf').placeholder=WK?'Type romaji to filter by Japanese word':'Filter by English meaning';flt();return}const sv=t.closest('[data-selv]');if(sv)return setVis(sv.dataset.selv=='1');const b=t.closest('[data-sel]');if(b)return sel(b.dataset.sel);const s=t.closest('[data-s]');if(s)return say(s.dataset.s);
 const c=t.closest('.chip');if(c)return put(c.dataset.v);
 const o=t.closest('.opt');if(o)ck(o.dataset.v)});
-document.addEventListener('input',e=>{if(e.target.id=='wf'){if(WK)e.target.value=toKana(e.target.value);flt();return}if(e.target.id!='ans')return;let x=toKana(e.target.value);if(Q&&Q.kata)x=kt(x);e.target.value=x;let y=toKana(x,1);if(Q&&Q.kata)y=kt(y);$('#pv').textContent=y!=x?'→ '+y:''});
+document.addEventListener('input',e=>{if(e.target.id=='nm'){e.target.value=kt(toKana(e.target.value,0,1));return}if(e.target.id=='wf'){if(WK)e.target.value=toKana(e.target.value);flt();return}if(e.target.id!='ans')return;let x=toKana(e.target.value,0,Q&&Q.kata);if(Q&&Q.kata)x=kt(x);e.target.value=x;let y=toKana(x,1,Q&&Q.kata);if(Q&&Q.kata)y=kt(y);$('#pv').textContent=y!=x?'→ '+y:''});
 document.addEventListener('keydown',e=>{if(e.key!='Enter'||!Q)return;if(Q.d)nx();else if(e.target.id=='ans')ck()});
 document.addEventListener('dragstart',e=>{const v=e.target.dataset&&e.target.dataset.v;if(v)e.dataTransfer.setData('text/plain',v)});
 document.addEventListener('dragover',e=>{if(e.target.id=='bl')e.preventDefault()});
