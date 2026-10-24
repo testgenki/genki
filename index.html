@@ -60,11 +60,11 @@ const R={a:'あいうえお',k:'かきくけこ',s:'さしすせそ',t:'たち�
 for(const c in R)[...R[c]].forEach((k,i)=>k!='_'&&(M[(c=='a'?'':c)+'aiueo'[i]]=k));
 [['ky','き'],['gy','ぎ'],['ny','に'],['hy','ひ'],['by','び'],['py','ぴ'],['my','み'],['ry','り'],['sh','し'],['ch','ち'],['j','じ'],['jy','じ']].forEach(([p,k])=>[...'aiueo'].forEach((v,i)=>'aou'.includes(v)&&(M[p+v]=k+'ゃゅょ'['auo'.indexOf(v)])));
 Object.assign(M,{fa:'ふぁ',fi:'ふぃ',fe:'ふぇ',fo:'ふぉ',she:'しぇ',che:'ちぇ',je:'じぇ',thi:'てぃ',dhi:'でぃ',wi:'うぃ',we:'うぇ',xa:'ぁ',xi:'ぃ',xu:'ぅ',xe:'ぇ',xo:'ぉ',xya:'ゃ',xyu:'ゅ',xyo:'ょ',xtu:'っ',sya:'しゃ',syu:'しゅ',syo:'しょ',tya:'ちゃ',tyu:'ちゅ',tyo:'ちょ',zya:'じゃ',zyu:'じゅ',zyo:'じょ'});
-function toKana(s,f,K){s=s.toLowerCase();let o='',i=0;while(i<s.length){const r=s.slice(i);if(K&&/^[td]i/.test(r)){o+=r[0]=='t'?'てぃ':'でぃ';i+=2;continue}
+function toKana(s,f,K,N){s=s.toLowerCase();let o='',i=0;while(i<s.length){const r=s.slice(i);if(K&&/^[td]i/.test(r)){o+=r[0]=='t'?'てぃ':'でぃ';i+=2;continue}
 if(/^([kstpcgzdbhmrfjw])\1/.test(r)){o+='っ';i++;continue}
 if(!f&&r=='nn'){o+=r;break}
 if(r[0]=='n'&&(r[1]=="'"||(r[1]=='n'&&!/[aiueoy]/.test(r[2]||'')))){o+='ん';i+=2;continue}
-if(r[0]=='n'&&r[1]&&!/[aiueoy]/.test(r[1])){o+='ん';i++;continue}
+if(r[0]=='n'&&r[1]&&!(N?/[aiueo]/:/[aiueoy]/).test(r[1])){o+='ん';i++;continue}
 if(r=='n'&&f){o+='ん';i++;continue}
 const k=M[r.slice(0,4)]?4:M[r.slice(0,3)]?3:M[r.slice(0,2)]?2:M[r[0]]?1:0;
 if(k){o+=M[r.slice(0,k)];i+=k}else{o+=r[0];i++}}return o}
@@ -255,7 +255,7 @@ const q=sh(m=='mix'?[...v.map(w=>[tw,mw,lw][Math.random()*3|0](w)),...F().filter
 return S.cap>0?q.slice(0,S.cap):q}
 function startQ(i,m){const q=bq(L[i],m,i+1);if(!q.length)return flash('No questions available. Check your word selection and limit.');Q={l:i,m,q,i:0,s:0,miss:[]};qn()}
 const TY=['type','fill','listen'];
-function qn(){const q=Q.q[Q.i];Q.d=0;Q.pick='';Q.kata=/^[ァ-ヶー]+$/.test(q.a.split('|')[0]);
+function qn(){const q=Q.q[Q.i];Q.d=0;Q.pick='';Q.kata=/^[ァ-ヶー]+$/.test(q.a.split('|')[0]);Q.ny=q.a.split('|').some(x=>/ん[やゆよ]/.test(x))&&!/に[ゃゅょ]/.test(q.a);
 let h=`<button onclick="render()">✕ Quit</button><p class="mu">Question ${Q.i+1} of ${Q.q.length}</p><div class="card">`;
 if(q.ctx)h+=`<p class="jp">${fu(q.ctx)}</p><hr>`;
 if(q.k=='listen')h+=`<p>${q.p}</p><button class="pri" data-s="${q.s}">▶ Play again</button>`;
@@ -267,7 +267,7 @@ if(TY.includes(q.k))h+=`<input id="ans" autocomplete="off" autocapitalize="off" 
 h+=`<div id="pv" class="mu"></div></div><div class="fb" id="fb"></div>`+(q.k=='mc'?'':`<button class="pri" id="chk" onclick="ck()">Check</button>`);
 app.innerHTML=shell(h);if($('#ans'))$('#ans').focus();if(q.k=='listen')setTimeout(()=>say(q.s),250)}
 function ck(v){if(Q.d)return;const q=Q.q[Q.i];let g,ok;
-if(TY.includes(q.k)){g=toKana($('#ans').value,1,Q.kata);if(Q.kata)g=kt(g);$('#ans').value=g;$('#pv').textContent='';ok=q.a.split('|').some(x=>nz(x)==nz(g)||(!/^[ァ-ヶー]+$/.test(x)&&hk(nz(x))==hk(nz(g))))}else{g=v!==undefined?v:Q.pick;if(!g)return;ok=g==q.a}
+if(TY.includes(q.k)){g=toKana($('#ans').value,1,Q.kata,Q.ny);if(Q.kata)g=kt(g);$('#ans').value=g;$('#pv').textContent='';ok=q.a.split('|').some(x=>nz(x)==nz(g)||(!/^[ァ-ヶー]+$/.test(x)&&hk(nz(x))==hk(nz(g))))}else{g=v!==undefined?v:Q.pick;if(!g)return;ok=g==q.a}
 Q.d=1;if(ok)Q.s++;else Q.miss.push(q.a);
 $('#fb').innerHTML=ok?'<span class="ok">✓ Correct</span>':`<span class="no">✗ Answer: ${q.a.split('|').join(' / ')}</span>`+(g?` <small>(you wrote: ${g})</small>`:'');
 if($('#chk'))$('#chk').remove();$('#fb').insertAdjacentHTML('afterend',`<button class="pri" onclick="nx()">${Q.i+1<Q.q.length?'Next':'Finish'}</button>`)}
@@ -358,7 +358,7 @@ if(k){e.preventDefault();const c=k.dataset.k;S.off[c]=!S.off[c];document.querySe
 const m=t.closest('[data-wfm]');if(m){WK=!WK;m.textContent=WK?'あ Kana':'A English';$('#wf').placeholder=WK?'Type romaji to filter by Japanese word':'Filter by English meaning';flt();return}const sv=t.closest('[data-selv]');if(sv)return setVis(sv.dataset.selv=='1');const b=t.closest('[data-sel]');if(b)return sel(b.dataset.sel);const s=t.closest('[data-s]');if(s)return say(s.dataset.s);
 const c=t.closest('.chip');if(c)return put(c.dataset.v);
 const o=t.closest('.opt');if(o)ck(o.dataset.v)});
-document.addEventListener('input',e=>{if(e.target.id=='nm'){e.target.value=kt(toKana(e.target.value,0,1));return}if(e.target.id=='wf'){if(WK)e.target.value=toKana(e.target.value);flt();return}if(e.target.id!='ans')return;let x=toKana(e.target.value,0,Q&&Q.kata);if(Q&&Q.kata)x=kt(x);e.target.value=x;let y=toKana(x,1,Q&&Q.kata);if(Q&&Q.kata)y=kt(y);$('#pv').textContent=y!=x?'→ '+y:''});
+document.addEventListener('input',e=>{if(e.target.id=='nm'){e.target.value=kt(toKana(e.target.value,0,1));return}if(e.target.id=='wf'){if(WK)e.target.value=toKana(e.target.value);flt();return}if(e.target.id!='ans')return;let x=toKana(e.target.value,0,Q&&Q.kata,Q&&Q.ny);if(Q&&Q.kata)x=kt(x);e.target.value=x;let y=toKana(x,1,Q&&Q.kata,Q&&Q.ny);if(Q&&Q.kata)y=kt(y);$('#pv').textContent=y!=x?'→ '+y:''});
 document.addEventListener('keydown',e=>{if(e.key!='Enter'||!Q)return;if(Q.d)nx();else if(e.target.id=='ans')ck()});
 document.addEventListener('dragstart',e=>{const v=e.target.dataset&&e.target.dataset.v;if(v)e.dataTransfer.setData('text/plain',v)});
 document.addEventListener('dragover',e=>{if(e.target.id=='bl')e.preventDefault()});
