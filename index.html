@@ -268,7 +268,7 @@ if(TY.includes(q.k)){const mx=/[ァ-ヶ]/.test(q.a)&&!Q.kata;h+=`<div style="dis
 h+=`<div id="pv" class="mu"></div></div><div class="fb" id="fb"></div>`+(q.k=='mc'?'':`<button class="pri" id="chk" onclick="ck()">Check</button>`);
 app.innerHTML=shell(h);if($('#ans'))$('#ans').focus();if(q.k=='listen')setTimeout(()=>say(q.s),250)}
 function ck(v){if(Q.d)return;Q.note='';const q=Q.q[Q.i];let g,ok;
-if(TY.includes(q.k)){g=toKana($('#ans').value,1,Q.kata,Q.ny,Q.km);if(Q.kata)g=kt(g);$('#ans').value=g;$('#pv').textContent='';const mm=q.a.split('|').find(x=>nz(x)==nz(g)||(!/^[ァ-ヶー]+$/.test(x)&&hk(nz(x))==hk(nz(g))));ok=!!mm;Q.note=ok&&nz(mm)!=nz(g)?mm:''}else{g=v!==undefined?v:Q.pick;if(!g)return;ok=g==q.a}
+if(TY.includes(q.k)){g=toKana($('#ans').value,1,Q.kata,Q.ny,Q.km);if(Q.kata)g=kt(g);$('#ans').value=g;$('#pv').textContent='';const mm=q.a.split('|').find(x=>nz(x)==nz(g)||(!/^[ァ-ヶー]+$/.test(x)&&hk(nz(x))==hk(nz(g))));ok=!!mm;Q.note=ok&&nz(mm)!=nz(g)?mm:''}else{g=v!==undefined?v:Q.pick;if(!g)return;ok=q.a.split('|').includes(g)}
 Q.d=1;if(ok)Q.s++;else Q.miss.push(q.a);
 $('#fb').innerHTML=ok?'<span class="ok">✓ Correct</span>'+(Q.note?` <small>Write it as ${Q.note}</small>`:''):`<span class="no">✗ Answer: ${q.a.split('|').join(' / ')}</span>`+(g?` <small>(you wrote: ${g})</small>`:'');
 if($('#chk'))$('#chk').remove();$('#fb').insertAdjacentHTML('afterend',`<button class="pri" onclick="nx()">${Q.i+1<Q.q.length?'Next':'Finish'}</button>`)}
@@ -337,7 +337,7 @@ mo:()=>{const p=pk(PE),q=pk(PE.filter(x=>x!=p)),o=pk(OC),i=pk(IT),t=rnd(3);
 neg:()=>{const i=pk(IT),p=pk(PE),o=pk(OC),t=rnd(3);
  if(t==0)return{k:'type',p:`Say: "This is not a ${i[2]}."`,a:ne('これは',i[1])};
  if(t==1)return{k:'type',p:`Say: "${p[2]} is not a ${o[2]}."`,a:ne(p[1]+'さんは',o[1])};
- return{k:dr(),p:`これ{は|わ}${i[0]}___。`,a:'じゃありません',en:`This is not a ${i[2]}.`,o:sh(['じゃありません','です','ですか','ありません'])}},
+ return{k:dr(),p:`これ{は|わ}${i[0]}___。`,a:'じゃありません|ではありません|じゃないです',en:`This is not a ${i[2]}.`,o:sh(['じゃありません','です','ですか','ありません'])}},
 shop:()=>{const i=pk(IT),n=pk(PR),t=rnd(5),a=nr(n)+'えん';
  if(t==0)return{k:'type',p:`Ask: "How much is this ${i[2]}?"`,a:`この${i[1]}はいくらですか|${i[1]}はいくらですか|これはいくらですか`};
  if(t==1)return{k:'type',p:`The ${i[2]} costs ¥${n.toLocaleString('en-US')}. Write the price in hiragana.`,a};
